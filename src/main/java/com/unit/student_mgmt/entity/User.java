@@ -37,6 +37,7 @@ public class User {
     @Lob
     Blob photo;
 
+    @Column(updatable = false)
     LocalDate admissionDate;
 
     @ManyToMany

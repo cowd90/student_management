@@ -2,6 +2,7 @@ package com.unit.student_mgmt.service;
 
 import com.unit.student_mgmt.constant.PredefinedRole;
 import com.unit.student_mgmt.dto.request.UserCreateRequest;
+import com.unit.student_mgmt.dto.request.UserUpdateRequest;
 import com.unit.student_mgmt.dto.response.UserResponse;
 import com.unit.student_mgmt.entity.Role;
 import com.unit.student_mgmt.entity.User;
@@ -16,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +27,6 @@ import java.io.IOException;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
 import java.util.HashSet;
 
 @Service
@@ -39,6 +40,7 @@ public class UserService {
 	UserMapper userMapper;
 
 	@Transactional
+	@PreAuthorize("hasRole('ADMIN')")
 	public UserResponse createUser(UserCreateRequest request) {
 		User user = userMapper.toUser(request);
 		Blob photoBlob = uploadPhoto(request.getPhoto());
@@ -74,6 +76,31 @@ public class UserService {
 		userResponse.setPhoto(photoBase64);
 
 		return userResponse;
+	}
+
+	@PreAuthorize("hasRole('USER')")
+	public UserResponse updateUser(Long id, UserUpdateRequest request) {
+		User user = userRepository.findById(id)
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTS));
+
+		userMapper.updateUser(user, request);
+		Blob photoBlob = uploadPhoto(request.getPhoto());
+		user.setPhoto(photoBlob);
+		user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+		user = userRepository.save(user);
+
+		// convert image blob to base64
+		String photoBase64 = ImageUtils.convertToBase64(photoBlob);
+		UserResponse userResponse = userMapper.toUserResponse(user);
+		userResponse.setPhoto(photoBase64);
+
+		return userResponse;
+	}
+
+	@PreAuthorize("hasRole('ADMIN')")
+	public void deleteUser(Long id) {
+		userRepository.deleteById(id);
 	}
 
 	@Transactional
