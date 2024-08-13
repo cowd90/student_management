@@ -11,5 +11,6 @@ public interface UserMapper {
 	@Mapping(target = "photo", ignore = true)
 	User toUser(UserCreateRequest request);
 
+	@Mapping(target = "photo", ignore = true)
 	UserResponse toUserResponse(User user);
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.sql.Blob;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -17,7 +18,7 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     String studentId;
@@ -30,11 +31,11 @@ public class User {
 
     LocalDate dob;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     Gender gender;
 
     @Lob
-    String photo;
+    Blob photo;
 
     LocalDate admissionDate;
 

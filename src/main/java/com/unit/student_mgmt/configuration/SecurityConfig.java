@@ -1,6 +1,5 @@
 package com.unit.student_mgmt.configuration;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,15 +16,19 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
-
     private static final String[] PUBLIC_ENDPOINT = {
-            ""
+            "/users", "/auth/*"
     };
+
     private final CustomJwtDecoder customJwtDecoder;
 
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityConfig(CustomJwtDecoder customJwtDecoder) {
+        this.customJwtDecoder = customJwtDecoder;
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT)
                 .permitAll()
                 .anyRequest()
