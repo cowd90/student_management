@@ -18,7 +18,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,7 +37,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -87,10 +88,20 @@ public class UserService {
 		return userResponse;
 	}
 
-	@PreAuthorize("hasRole('STUDENT') or hasRole('ADMIN')")
 	public UserResponse updateUser(Long id, UserUpdateRequest request) {
 		User user = userRepository.findById(id)
 				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTS));
+
+		var authentication = SecurityContextHolder.getContext().getAuthentication();
+		var isAdmin = authentication.getAuthorities().stream()
+				.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+
+		if (!isAdmin) {
+			var username = authentication.getName();
+			if (!(username.equals(user.getStudentId()))) {
+				throw new AppException(ErrorCode.UNAUTHORIZED);
+			}
+		}
 
 		userMapper.updateUser(user, request);
 		Blob photoBlob = uploadPhoto(request.getPhoto());

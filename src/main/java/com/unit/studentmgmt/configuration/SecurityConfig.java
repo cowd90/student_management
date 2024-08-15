@@ -22,7 +22,7 @@ public class SecurityConfig {
     };
 
     private static final String[] PUBLIC_GET_ENDPOINT = {
-            "/users/search", "/users/search-by-date", "/auth/**"
+            "/users/**", "/auth/**"
     };
 
     private final CustomJwtDecoder customJwtDecoder;

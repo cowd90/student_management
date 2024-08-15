@@ -55,7 +55,7 @@ public class User {
     @Column(insertable = false)
     LocalDateTime updateAt;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     Set<Role> roles;
 
 }
