@@ -132,7 +132,7 @@ public class AuthenticationService {
 
         Date expiredTime = (isRefresh)
                 ? new Date(signedJWT.getJWTClaimsSet().getIssueTime().toInstant()
-                .plus(REFRESH_DURATION, ChronoUnit.SECONDS).toEpochMilli())
+                    .plus(REFRESH_DURATION, ChronoUnit.SECONDS).toEpochMilli())
                 : signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified = signedJWT.verify(verifier);

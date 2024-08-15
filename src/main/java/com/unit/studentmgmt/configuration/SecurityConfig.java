@@ -17,8 +17,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    private static final String[] PUBLIC_ENDPOINT = {
+    private static final String[] PUBLIC_POST_ENDPOINT = {
             "/users", "/auth/**"
+    };
+
+    private static final String[] PUBLIC_GET_ENDPOINT = {
+            "/users/search", "/users/search-by-date", "/auth/**"
     };
 
     private final CustomJwtDecoder customJwtDecoder;
@@ -29,7 +33,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT)
+        http.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINT)
+                .permitAll()
+                .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINT)
                 .permitAll()
                 .anyRequest()
                 .authenticated()

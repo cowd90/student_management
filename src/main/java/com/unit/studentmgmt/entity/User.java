@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.sql.Blob;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity(name = "users")
@@ -48,11 +49,11 @@ public class User {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    LocalDate createAt;
+    LocalDateTime createAt;
 
     @LastModifiedDate
     @Column(insertable = false)
-    LocalDate updateAt;
+    LocalDateTime updateAt;
 
     @ManyToMany(fetch = FetchType.LAZY)
     Set<Role> roles;

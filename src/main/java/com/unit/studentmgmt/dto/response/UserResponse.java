@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -23,7 +24,7 @@ public class UserResponse {
     String photo;
     LocalDate admissionDate;
     String classBelongs;
-    LocalDate createAt;
-    LocalDate updateAt;
+    LocalDateTime createAt;
+    LocalDateTime updateAt;
     Set<Role> roles;
 }

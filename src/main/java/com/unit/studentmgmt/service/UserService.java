@@ -18,10 +18,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,9 +31,11 @@ import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -131,14 +130,39 @@ public class UserService {
 		return userResponse;
 	}
 
-	public Page<UserResponse> searchByName(String name, int page, int size) {
-		Pageable pageable = PageRequest.of(page, size);
-		var students = userRepository.findByFullNameContainingIgnoreCase(name, pageable);
+	public List<UserResponse> searchByName(String conditional, int page, int size) {
+		Pageable pageable = PageRequest.of(
+				page,
+				size,
+				Sort.by("studentId").ascending()
+		);
+		var students = userRepository.findAllByFullNameOrStudentIdContainingIgnoreCase(conditional, pageable);
 
-		List<UserResponse> studentResponses = students
+		return students
 				.map(userMapper::toUserResponse)
 				.stream().toList();
-		return new PageImpl<>(studentResponses, pageable, students.getTotalElements());
+	}
+
+	public List<UserResponse> searchStudentsByAdmissionDateRange(LocalDate start, LocalDate end, int page, int size) {
+		Pageable pageable = PageRequest.of(
+				page,
+				size,
+				Sort.by("studentId").ascending()
+		);
+		var students = userRepository
+				.findByAdmissionDateBetween(start, end, pageable);
+
+		return students
+				.map(userMapper::toUserResponse)
+				.stream().toList();
+	}
+
+	@PreAuthorize("hasRole('ADMIN')")
+	public List<UserResponse> getAllUsers() {
+		return userRepository
+				.findAll().stream()
+				.map(userMapper::toUserResponse)
+				.toList();
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
@@ -157,9 +181,8 @@ public class UserService {
 			throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
 		}
 	}
-	
+
 	private String generateStudentId(Long id, int yearOfAdmission) {
 		return yearOfAdmission + String.format("%06d", id);
 	}
-	
 }
