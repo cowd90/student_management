@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,14 +19,16 @@ import java.util.HashSet;
 
 @Configuration
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class ApplicationInitConfig {
 
-    PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    static final String ADMIN_EMAIL = "admin@yopmail.com";
-    static final String ADMIN_PASSWORD = "admin123";
+    @Value("${account.username}")
+    private String ADMIN_EMAIL;
+
+    @Value("${account.password}")
+    private String ADMIN_PASSWORD;
 
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
@@ -51,8 +54,8 @@ public class ApplicationInitConfig {
                       .build());
 
               userRepository.save(admin);
-              log.warn("Admin has been created with default " +
-                      "email: admin@yopmail.com and password: admin. Please change it");
+              log.info("Admin has been created with default " +
+                      "email: {} and password: {}. Please change it", ADMIN_EMAIL, ADMIN_PASSWORD);
           }
         };
     }

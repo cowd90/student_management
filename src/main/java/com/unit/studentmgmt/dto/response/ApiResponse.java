@@ -20,5 +20,6 @@ public class ApiResponse<T> {
 	@Default
 	int code = 200;
 	String message;
+	String detailMessage;
 	T data;
 }

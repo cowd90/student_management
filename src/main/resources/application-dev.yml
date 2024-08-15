@@ -16,10 +16,14 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 500KB
+      max-request-size: 500KB
 
 jwt:
   signer-key: ${SIGNER_KEY}
   valid-duration: ${VALID_DURATION}
   refresh-duration: ${REFRESH_DURATION}
+
+account:
+  username: ${ADMIN_USERNAME}
+  password: ${ADMIN_PASSWORD}
