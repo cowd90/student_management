@@ -9,6 +9,7 @@ import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatusCode;
 
 @Data
 @Builder
@@ -18,7 +19,7 @@ import lombok.experimental.FieldDefaults;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
 	@Default
-	int code = 200;
+	String code = "App-200";
 	String message;
 	String detailMessage;
 	T data;

@@ -2,7 +2,6 @@ package com.unit.studentmgmt.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,12 +16,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    private static final String[] PUBLIC_POST_ENDPOINT = {
-            "/users", "/auth/**"
-    };
-
-    private static final String[] PUBLIC_GET_ENDPOINT = {
-            "/users/**", "/auth/**"
+    private static final String[] PUBLIC_ENDPOINT = {
+            "/users", "/auth/**",
+            "/v2/api-docs",
+            "/v3/api-docs",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
     };
 
     private final CustomJwtDecoder customJwtDecoder;
@@ -33,9 +33,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINT)
-                .permitAll()
-                .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINT)
+        http.authorizeHttpRequests(request -> request.requestMatchers(PUBLIC_ENDPOINT)
                 .permitAll()
                 .anyRequest()
                 .authenticated()

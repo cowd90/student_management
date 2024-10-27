@@ -11,9 +11,9 @@ import java.util.Base64;
 import java.util.List;
 
 public class ImageUtils {
-    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    private static final long MAX_FILE_SIZE = 500 * 1024; // 500KB
     private static final List<String> ACCEPTED_FILE_TYPES = Arrays.asList(
-            "image/jpeg", "image/png", "image/gif"
+            "image/jpeg", "image/png"
     );
     public static void validateFile(MultipartFile file) {
         if (!file.isEmpty()) {

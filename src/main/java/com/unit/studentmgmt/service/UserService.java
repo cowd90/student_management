@@ -99,7 +99,7 @@ public class UserService {
 		if (!isAdmin) {
 			var username = authentication.getName();
 			if (!(username.equals(user.getStudentId()))) {
-				throw new AppException(ErrorCode.UNAUTHORIZED);
+				throw new AppException(ErrorCode.FORBIDDEN);
 			}
 		}
 
@@ -177,7 +177,7 @@ public class UserService {
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
-	public void deleteUser(Long id) {
+	public void deleteUser(Long id) { // return bool
 		userRepository.deleteById(id);
 	}
 

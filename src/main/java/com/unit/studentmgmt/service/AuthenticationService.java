@@ -70,12 +70,12 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTS));
+                .orElseThrow(() -> new AppException(ErrorCode.INCORRECT_EMAIL_PASSWORD));
 
         boolean isAuthenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
         if (!isAuthenticated) {
-            throw new AppException(ErrorCode.INCORRECT_PASSWORD);
+            throw new AppException(ErrorCode.INCORRECT_EMAIL_PASSWORD);
         }
 
         var token = generateToken(user);
