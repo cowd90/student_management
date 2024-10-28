@@ -1,7 +1,7 @@
 package com.unit.studentmgmt.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unit.studentmgmt.dto.response.ApiResponse;
+import com.unit.studentmgmt.dto.response.BaseRes;
 import com.unit.studentmgmt.exception.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,7 +22,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(errorCode.getStatusCode().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        ApiResponse<?> apiResponse = ApiResponse.builder()
+        BaseRes<?> apiResponse = BaseRes.builder()
                 .code(errorCode.getCode())
                 .message(errorCode.getMessage())
                 .build();

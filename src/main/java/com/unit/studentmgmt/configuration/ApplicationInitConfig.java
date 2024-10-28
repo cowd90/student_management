@@ -5,17 +5,13 @@ import com.unit.studentmgmt.entity.Role;
 import com.unit.studentmgmt.entity.User;
 import com.unit.studentmgmt.repository.RoleRepository;
 import com.unit.studentmgmt.repository.UserRepository;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.HashSet;
 
 @Configuration
 @RequiredArgsConstructor
@@ -35,22 +31,25 @@ public class ApplicationInitConfig {
         return args -> {
           if (!userRepository.existsByEmail(ADMIN_EMAIL)) {
               roleRepository.save(Role.builder()
-                              .name(PredefinedRole.STUDENT_ROLE)
+                              .roleName(PredefinedRole.STUDENT_ROLE)
                               .description("Student Role")
                       .build());
 
+              roleRepository.save(Role.builder()
+                      .roleName(PredefinedRole.LECTURER_ROLE)
+                      .description("Lecturer Role")
+                      .build());
+
               Role adminRole = roleRepository.save(Role.builder()
-                              .name(PredefinedRole.ADMIN_ROLE)
+                              .roleName(PredefinedRole.ADMIN_ROLE)
                               .description("Admin Role")
                       .build());
 
-              var roles = new HashSet<Role>();
-              roles.add(adminRole);
-
               User admin = userRepository.save(User.builder()
+                              .username(ADMIN_EMAIL)
                               .email(ADMIN_EMAIL)
                               .password(passwordEncoder.encode(ADMIN_PASSWORD))
-                              .roles(roles)
+                              .role(adminRole)
                       .build());
 
               userRepository.save(admin);

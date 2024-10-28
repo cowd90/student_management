@@ -1,61 +1,67 @@
+/*******************************************************************************
+ * Class        ：User
+ * Created date ：2024/10/28
+ * Lasted date  ：2024/10/28
+ * Author       ：dungnt3
+ * Change log   ：2024/10/28：01-00 dungnt3 create a new
+ ******************************************************************************/
 package com.unit.studentmgmt.entity;
 
-import com.unit.studentmgmt.constant.Gender;
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.sql.Blob;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Set;
 
-@Entity(name = "users")
+/**
+ * User
+ *
+ * @author dungnt3
+ * @version 01-00
+ * @since 01-00
+ */
+@Entity
+@Table(name = "users")
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@EntityListeners(AuditingEntityListener.class)
+@AllArgsConstructor
+@Builder
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long userId;
 
-    String studentId;
+    @Column(nullable = false, unique = true)
+    private String username;
 
-    String email;
+    @Column(nullable = false)
+    private String password;
 
-    String fullName;
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
 
-    String password;
+    @Column(name = "full_name", nullable = false)
+    private String fullName;
 
-    LocalDate dob;
+    @Column(nullable = false, unique = true)
+    private String email;
 
-    @Enumerated(EnumType.STRING)
-    Gender gender;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Lob
-    Blob photo;
-
-    @Column(updatable = false)
-    LocalDate admissionDate;
-
-    String classBelongs;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    LocalDateTime createAt;
-
-    @LastModifiedDate
-    @Column(insertable = false)
-    LocalDateTime updateAt;
-
-    @ManyToMany
-    Set<Role> roles;
-
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }

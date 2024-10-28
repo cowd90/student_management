@@ -1,30 +1,17 @@
 package com.unit.studentmgmt.dto.response;
 
-import com.unit.studentmgmt.entity.Role;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Set;
-
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
-    String id;
-    String studentId;
-    String email;
-    String password;
-    String fullName;
-    LocalDate dob;
-    String gender;
-    String photo;
-    LocalDate admissionDate;
-    String classBelongs;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
-    Set<Role> roles;
+    
+    private Long userId;
+    private String username;
+    private String fullName;
+    private String email;
+    private String roleName;
 }

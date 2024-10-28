@@ -1,33 +1,47 @@
-CREATE TABLE users (
-    id BIGSERIAL PRIMARY KEY,
-    student_id VARCHAR(20) UNIQUE,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    full_name VARCHAR(100),
-    password VARCHAR(255) NOT NULL,
-    dob DATE,
-    gender VARCHAR(10)
-       CONSTRAINT student_gender_check
-           CHECK ((gender)::text = ANY
-                  ((ARRAY ['MALE'::CHARACTER VARYING, 'FEMALE'::CHARACTER VARYING, 'OTHER'::CHARACTER VARYING])::text[])),
-    photo oid,
-    admission_date DATE,
-    class_belongs VARCHAR(10),
-    created_at TIMESTAMP(0),
-    update_at TIMESTAMP(0)
-);
-
 CREATE TABLE roles (
-    id SERIAL NOT NULL PRIMARY KEY,
-    name VARCHAR(10),
-    description VARCHAR(50)
+                       role_id SERIAL PRIMARY KEY,
+                       role_name VARCHAR(50) NOT NULL UNIQUE,
+                       description TEXT
 );
 
-CREATE TABLE users_roles (
-    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-    role_id INT REFERENCES roles(id) ON DELETE CASCADE
+CREATE TABLE users (
+                       user_id SERIAL PRIMARY KEY,
+                       username VARCHAR(50) UNIQUE,
+                       password VARCHAR(255) NOT NULL,
+                       role_id INTEGER,
+                       full_name VARCHAR(100),
+                       email VARCHAR(100) UNIQUE,
+                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                       FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE
 );
 
-CREATE TABLE invalidated_token (
-    id VARCHAR(255) NOT NULL PRIMARY KEY,
-    expired_time TIMESTAMP(6)
+CREATE TABLE course_section (
+                                section_id SERIAL PRIMARY KEY,
+                                course_id VARCHAR(50) NOT NULL,
+                                section_name VARCHAR(100) NOT NULL,
+                                instructor_id INTEGER NOT NULL,
+                                FOREIGN KEY (instructor_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+CREATE TABLE registration (
+                              registration_id SERIAL PRIMARY KEY,
+                              student_id INTEGER NOT NULL,
+                              section_id INTEGER NOT NULL,
+                              registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                              FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                              FOREIGN KEY (section_id) REFERENCES course_section(section_id) ON DELETE CASCADE,
+                              UNIQUE (student_id, section_id)  -- Đảm bảo mỗi sinh viên chỉ có thể đăng ký một lần vào mỗi lớp học phần
+);
+
+CREATE TABLE grade (
+                       grade_id SERIAL PRIMARY KEY,
+                       student_id INTEGER NOT NULL,
+                       section_id INTEGER NOT NULL,
+                       grade NUMERIC(2, 0) CHECK (grade >= 0 AND grade <= 10),  -- Điểm số từ 0 đến 10
+                       comments TEXT,
+                       FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                       FOREIGN KEY (section_id) REFERENCES course_section(section_id) ON DELETE CASCADE,
+                       UNIQUE (student_id, section_id)  -- Đảm bảo mỗi sinh viên chỉ có một điểm cho mỗi lớp học phần
+);
+

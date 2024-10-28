@@ -1,6 +1,11 @@
 package com.unit.studentmgmt.service;
 
-import com.nimbusds.jose.*;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -12,10 +17,12 @@ import com.unit.studentmgmt.dto.request.RefreshRequest;
 import com.unit.studentmgmt.dto.response.AuthenticationResponse;
 import com.unit.studentmgmt.dto.response.IntrospectResponse;
 import com.unit.studentmgmt.entity.InvalidatedToken;
+import com.unit.studentmgmt.entity.Role;
 import com.unit.studentmgmt.entity.User;
 import com.unit.studentmgmt.exception.AppException;
 import com.unit.studentmgmt.exception.ErrorCode;
 import com.unit.studentmgmt.repository.InvalidatedTokenRepository;
+import com.unit.studentmgmt.repository.RoleRepository;
 import com.unit.studentmgmt.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +31,6 @@ import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
@@ -40,6 +46,7 @@ public class AuthenticationService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
     InvalidatedTokenRepository invalidatedTokenRepository;
+    RoleRepository roleRepository;
 
     @NonFinal
     @Value("${jwt.signer-key}")
@@ -113,9 +120,9 @@ public class AuthenticationService {
 
         invalidatedTokenRepository.save(invalidatedToken);
 
-        var studentId = signedJWT.getJWTClaimsSet().getSubject();
+        var userId = signedJWT.getJWTClaimsSet().getSubject();
 
-        var student = userRepository.findByStudentId(studentId)
+        var student = userRepository.findUserByUserId(Long.valueOf(userId))
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
         var token = generateToken(student);
@@ -153,7 +160,7 @@ public class AuthenticationService {
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet
                 .Builder()
-                .subject(user.getStudentId())
+                .subject(String.valueOf(user.getUserId()))
                 .issueTime(new Date())
                 .expirationTime(new Date(Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
@@ -175,8 +182,10 @@ public class AuthenticationService {
 
     private String buildScope(User user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
-        if (!CollectionUtils.isEmpty(user.getRoles())) {
-            user.getRoles().forEach(role -> stringJoiner.add("ROLE_" + role.getName()));
+        Role role = roleRepository.findById(user.getRole().getRoleId())
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+        if (user.getRole() != null) {
+            stringJoiner.add("ROLE_" + role.getRoleName());
         }
 
         return stringJoiner.toString();

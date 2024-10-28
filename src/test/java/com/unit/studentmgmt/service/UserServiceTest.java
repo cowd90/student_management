@@ -1,9 +1,6 @@
 package com.unit.studentmgmt.service;
 
 import com.unit.studentmgmt.constant.Gender;
-import com.unit.studentmgmt.dto.request.UserCreateRequest;
-import com.unit.studentmgmt.dto.response.UserResponse;
-import com.unit.studentmgmt.entity.User;
 import com.unit.studentmgmt.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

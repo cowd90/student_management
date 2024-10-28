@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Class        ：Role
+ * Class        ：Grade
  * Created date ：2024/10/28
  * Lasted date  ：2024/10/28
  * Author       ：dungnt3
@@ -12,6 +12,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,27 +22,35 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Role
+ * Grade
  *
  * @version 01-00
  * @since 01-00
  * @author dungnt3
  */
 @Entity
-@Table(name = "roles")
+@Table(name = "grade")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Role {
+public class Grade {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long roleId;
+    private Long gradeId;
 
-    @Column(name = "role_name", nullable = false, unique = true)
-    private String roleName;
+    @ManyToOne
+    @JoinColumn(name = "student_id", nullable = false)
+    private User student;
 
-    private String description;
+    @ManyToOne
+    @JoinColumn(name = "section_id", nullable = false)
+    private CourseSection courseSection;
+
+    @Column(nullable = false)
+    private Double grade;
+
+    private String comments;
 }
